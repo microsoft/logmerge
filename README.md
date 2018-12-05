@@ -1,3 +1,19 @@
+# logmerge
+
+logmerge merges multiple log files into a single stream, preserving the total ordering of events across the multiple log files.
+
+## Features
+
+- Supports multiple timestamp formats
+  - Date and time with either fractional seconds or comma-separated milliseconds 
+  - Integer or floating point time_t (base-1970)
+- Can tag each merged line with an arbitrary text tag per source log
+- Can color-code lines per log (using ANSI escape sequences)
+
+## Limitations
+
+- Assumes all timestamps are UTC. The currently-supported timestamp formats don't support a timezone tag.
+- Timestamps are not reformatted. If merged logs use different timestamp formats, the merged log will expose that.
 
 # Contributing
 
