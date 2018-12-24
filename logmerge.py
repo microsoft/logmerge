@@ -24,6 +24,8 @@ def make_argument_parser():
                                      description="Merge multiple log files, from different sources, preserving order")
     parser.add_argument("-p", "--prefix", help="List of prefixes to be applied to log entries", nargs="+")
     parser.add_argument("--no-prefix", help="Suppress automatic generation of prefixes", action="store_true")
+    parser.add_argument("-r", "--regex", help="Regex of timestamp")
+    parser.add_argument("-f", "--format", help="Format of timestamp")
     # parser.add_argument("--colors", help="List of colors for each log", required=False, nargs="+")
     parser.add_argument("-c", "--colorize", help="Color-code log output", required=False, action="store_true")
     parser.add_argument('logfiles', nargs='+')
@@ -37,6 +39,12 @@ def parse_datetime(line):
     :param line: The log line to be parsed
     :return: Either a datetime or None
     """
+    if custom_pattern:
+        match = custom_pattern.match(line)
+        if match:
+            entry_datetime = datetime.datetime.strptime(match.group(1), custom_format)
+            return entry_datetime
+
     match = iso8601_pattern.match(line)
     if match:
         entry_datetime = datetime.datetime.strptime(match.group(1), '%Y/%m/%d %H:%M:%S.%f')
@@ -169,6 +177,16 @@ def main():
     if args.logfiles is None or len(args.logfiles) < 2:
         print("Requires at least two logfiles")
         exit(1)
+    elif args.format is None and args.regex is not None:
+        print("Requires timestamp regex along with format")
+        exit(1)
+    elif args.regex is None and args.format is not None:
+        print("Requires timestamp format along with regex")
+        exit(1)
+
+    global custom_pattern, custom_format
+    custom_pattern = re.compile(args.regex.encode().decode('unicode_escape'))
+    custom_format = args.format
 
     prefixes = {}
     colors = {}
