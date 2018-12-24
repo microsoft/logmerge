@@ -20,8 +20,7 @@ def make_argument_parser():
     :return: Parser for command line
     :rtype argparse.ArgumentParser
     """
-    parser = argparse.ArgumentParser(prog="logparse",
-                                     description="Merge multiple log files, from different sources, preserving order")
+    parser = argparse.ArgumentParser(description="Merge multiple log files, from different sources, preserving order")
     parser.add_argument("-p", "--prefix", help="List of prefixes to be applied to log entries", nargs="+")
     parser.add_argument("--no-prefix", help="Suppress automatic generation of prefixes", action="store_true")
     # parser.add_argument("--colors", help="List of colors for each log", required=False, nargs="+")
