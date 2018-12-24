@@ -7,6 +7,7 @@
 import argparse
 import datetime
 import re
+import sys
 
 
 cloud_init_pattern = re.compile(r'(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) ')
@@ -154,6 +155,8 @@ def render(line, prefix_arg=None, color=-1):
     :param str prefix_arg: Optional prefix to be stuck at the beginning of the rendered line
     :param int color: If 0-255, insert escape codes to display the line in that color
     """
+    if not sys.stdout.isatty():
+        color = -1
     pretext = '' if prefix_arg is None else prefix_arg
     if -1 < color < 256:
         pretext = "\x1b[38;5;{}m{}".format(str(color), pretext)
