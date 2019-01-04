@@ -5,8 +5,10 @@
 # See LICENSE for license information.
 
 import argparse
+import collections
 import datetime
 import re
+import sys
 
 
 cloud_init_pattern = re.compile(r'(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) ')
@@ -184,17 +186,18 @@ def main():
     custom_pattern = re.compile(args.regex.encode().decode('unicode_escape'))
     custom_format = args.format
 
-    prefixes = {}
-    colors = {}
+    prefixes = collections.defaultdict(lambda: '')
+    colorize = args.colorize if sys.stdout.isatty() else False
+    colors = collections.defaultdict(lambda: 15 if colorize else -1)
     index = 1
     limit = len(args.prefix) if args.prefix else 0
-    no_prefix = args.no_prefix or (args.colorize and limit == 0)
+    no_prefix = args.no_prefix or (colorize and limit == 0)
+
     for path in args.logfiles:
-        if no_prefix:
-            prefixes[path] = ''
-        else:
+        if not no_prefix:
             prefixes[path] = "{} ".format(args.prefix[index-1]) if index <= limit else "log{} ".format(index)
-        colors[path] = index if args.colorize else 15
+        if colorize:
+            colors[path] = index
         index += 1
 
     merger = LogSet(args.logfiles)
