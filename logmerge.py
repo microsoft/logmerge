@@ -172,16 +172,15 @@ def main():
         print("Requires at least two logfiles")
         exit(1)
 
-    prefixes = {}
+    prefixes = collections.defaultdict(lambda: '')
     colorize = args.colorize if sys.stdout.isatty() else False
     colors = collections.defaultdict(lambda: 15 if colorize else -1)
     index = 1
     limit = len(args.prefix) if args.prefix else 0
     no_prefix = args.no_prefix or (colorize and limit == 0)
+
     for path in args.logfiles:
-        if no_prefix:
-            prefixes[path] = ''
-        else:
+        if not no_prefix:
             prefixes[path] = "{} ".format(args.prefix[index-1]) if index <= limit else "log{} ".format(index)
         if colorize:
             colors[path] = index
