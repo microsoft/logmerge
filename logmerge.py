@@ -5,6 +5,7 @@
 # See LICENSE for license information.
 
 import argparse
+import collections
 import datetime
 import re
 import sys
@@ -155,8 +156,6 @@ def render(line, prefix_arg=None, color=-1):
     :param str prefix_arg: Optional prefix to be stuck at the beginning of the rendered line
     :param int color: If 0-255, insert escape codes to display the line in that color
     """
-    if not sys.stdout.isatty():
-        color = -1
     pretext = '' if prefix_arg is None else prefix_arg
     if -1 < color < 256:
         pretext = "\x1b[38;5;{}m{}".format(str(color), pretext)
@@ -174,16 +173,18 @@ def main():
         exit(1)
 
     prefixes = {}
-    colors = {}
+    colorize = args.colorize if sys.stdout.isatty() else False
+    colors = collections.defaultdict(lambda: 15 if colorize else -1)
     index = 1
     limit = len(args.prefix) if args.prefix else 0
-    no_prefix = args.no_prefix or (args.colorize and limit == 0)
+    no_prefix = args.no_prefix or (colorize and limit == 0)
     for path in args.logfiles:
         if no_prefix:
             prefixes[path] = ''
         else:
             prefixes[path] = "{} ".format(args.prefix[index-1]) if index <= limit else "log{} ".format(index)
-        colors[path] = index if args.colorize else 15
+        if colorize:
+            colors[path] = index
         index += 1
 
     merger = LogSet(args.logfiles)
