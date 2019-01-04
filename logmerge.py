@@ -24,8 +24,8 @@ def make_argument_parser():
                                      description="Merge multiple log files, from different sources, preserving order")
     parser.add_argument("-p", "--prefix", help="List of prefixes to be applied to log entries", nargs="+")
     parser.add_argument("--no-prefix", help="Suppress automatic generation of prefixes", action="store_true")
-    parser.add_argument("-r", "--regex", help="Regex of timestamp")
-    parser.add_argument("-f", "--format", help="Format of timestamp")
+    parser.add_argument("-r", "--regex", help="Regex to match and capture the entire timestamp")
+    parser.add_argument("-f", "--format", help="strptime format to convert the captured timestamp")
     # parser.add_argument("--colors", help="List of colors for each log", required=False, nargs="+")
     parser.add_argument("-c", "--colorize", help="Color-code log output", required=False, action="store_true")
     parser.add_argument('logfiles', nargs='+')
@@ -177,11 +177,8 @@ def main():
     if args.logfiles is None or len(args.logfiles) < 2:
         print("Requires at least two logfiles")
         exit(1)
-    elif args.format is None and args.regex is not None:
-        print("Requires timestamp regex along with format")
-        exit(1)
-    elif args.regex is None and args.format is not None:
-        print("Requires timestamp format along with regex")
+    elif not args.format ^ args.regex:
+        print("Requires both timestamp regex and format or none")
         exit(1)
 
     global custom_pattern, custom_format
