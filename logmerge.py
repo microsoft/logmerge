@@ -178,13 +178,16 @@ def main():
     if args.logfiles is None or len(args.logfiles) < 2:
         print("Requires at least two logfiles")
         exit(1)
-    elif not args.format ^ args.regex:
+    elif bool(args.format) != bool(args.regex):
         print("Requires both timestamp regex and format or none")
         exit(1)
 
     global custom_pattern, custom_format
-    custom_pattern = re.compile(args.regex.encode().decode('unicode_escape'))
-    custom_format = args.format
+    if args.regex:
+        custom_pattern = re.compile(args.regex.encode().decode('unicode_escape'))
+        custom_format = args.format
+    else:
+        custom_pattern, custom_format = None, None
 
     prefixes = collections.defaultdict(lambda: '')
     colorize = args.colorize if sys.stdout.isatty() else False
