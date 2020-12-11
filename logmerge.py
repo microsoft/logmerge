@@ -14,7 +14,7 @@ import sys
 cloud_init_pattern = re.compile(r'(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d,\d\d\d) ')
 iso8601_pattern = re.compile(r'(\d\d\d\d/\d\d/\d\d \d\d:\d\d:\d\d\.\d+) ')
 timestamp_pattern = re.compile(r'((\d+)(\.\d+)?) ')
-
+syslog_pattern = re.compile(r'(.{3} \d\d \d\d:\d\d:\d\d)') # RFC3339 / Linux
 
 def make_argument_parser():
     """
@@ -59,6 +59,11 @@ def parse_datetime(line):
     match = timestamp_pattern.match(line)
     if match:
         entry_datetime = datetime.datetime.utcfromtimestamp(float(match.group(1)))
+        return entry_datetime
+
+    match = syslog_pattern.match(line)
+    if match:
+        entry_datetime = datetime.datetime.strptime(match.group(1), '%b %d %H:%M:%S')
         return entry_datetime
 
     return None
