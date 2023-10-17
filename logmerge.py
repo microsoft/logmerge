@@ -89,7 +89,7 @@ class Logfile:
             results.append(line)
 
     def __init__(self, path):
-        self._f = open(path, "r")
+        self._f = open(path, "r", errors='replace')
         self._eof = False
         self._timestamp = datetime.datetime.max
         self._line = ''
